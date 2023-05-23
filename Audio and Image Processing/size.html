@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Resize Image</title>
+    <style>
+        .menu {
+            margin-bottom: 20px;
+        }
+    
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .menu li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    
+        .menu li a {
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    
+        .menu li a:hover {
+            background-color: #f0f0f0;
+        }
+        img {
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <ul>
+            <li><a href="kecerahan.html">Ubah Kecerahan Gambar</a></li>
+            <li><a href="blur.html">Ubah Blur Gambar</a></li>
+            <li><a href="size.html">Ubah Ukuran Gambar</a></li>
+            <li><a href="compress.html">Ubah Kualitas Gambar</a></li>
+            <li><a href="audio.html">Audio Processing</a></li>
+        </ul>
+    </div>
+    <h1>Ubah Ukuran Gambar</h1>
+    <form>
+        <label for="image">Pilih gambar:</label>
+        <input type="file" id="image" accept="image/*">
+        <br><br>
+        <label for="width">Lebar:</label>
+        <input type="number" id="width">
+        <br><br>
+        <label for="height">Tinggi:</label>
+        <input type="number" id="height">
+        <br><br>
+        <input type="button" value="Proses" onclick="resizeImage()">
+    </form>
+    <br>
+    <img id="resizedImage" src="" alt="Resized Image">
+    <script>
+        function resizeImage() {
+                const imageInput = document.getElementById('image');
+                const widthInput = document.getElementById('width');
+                const heightInput = document.getElementById('height');
+                const resizedImage = document.getElementById('resizedImage');
+
+                // Cek apakah file gambar telah dipilih
+                if (imageInput.files && imageInput.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const img = new Image();
+                        img.onload = function () {
+                            // Ubah ukuran gambar
+                            const canvas = document.createElement('canvas');
+                            canvas.width = widthInput.value;
+                            canvas.height = heightInput.value;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, widthInput.value, heightInput.value);
+
+                            // Tampilkan gambar yang diubah ukurannya
+                            resizedImage.src = canvas.toDataURL('image/jpeg');
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                }
+            }
+
+    </script>
+</body>
+
+</html>

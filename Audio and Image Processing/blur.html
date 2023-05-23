@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Blur</title>
+    <style>
+        .menu {
+            margin-bottom: 20px;
+        }
+    
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .menu li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    
+        .menu li a {
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    
+        .menu li a:hover {
+            background-color: #f0f0f0;
+        }
+        img {
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <ul>
+            <li><a href="kecerahan.html">Ubah Kecerahan Gambar</a></li>
+            <li><a href="blur.html">Ubah Blur Gambar</a></li>
+            <li><a href="size.html">Ubah Ukuran Gambar</a></li>
+            <li><a href="compress.html">Ubah Kualitas Gambar</a></li>
+            <li><a href="audio.html">Audio Processing</a></li>
+        </ul>
+    </div>
+    <h1>Blur Gambar</h1>
+    <form>
+        <label for="image">Pilih gambar:</label>
+        <input type="file" id="image" accept="image/*">
+        <br><br>
+        <label for="blur">Blur (0-10):</label>
+        <input type="range" id="blur" min="0" max="10" step="0.1" value="0">
+        <br><br>
+        <input type="button" value="Proses" onclick="applyBlur()">
+    </form>
+    <br>
+    <img id="imageDisplay" src="" alt="Image">
+    <script>
+        function applyBlur() {
+                const imageInput = document.getElementById('image');
+                const blurInput = document.getElementById('blur');
+                const imageDisplay = document.getElementById('imageDisplay');
+
+                // Cek apakah file gambar telah dipilih
+                if (imageInput.files && imageInput.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const img = new Image();
+                        img.onload = function () {
+                            // Buat elemen canvas
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+
+                            // Gambar gambar asli ke canvas
+                            ctx.drawImage(img, 0, 0);
+
+                            // Dapatkan data piksel gambar
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            // Dapatkan tingkat blur yang diatur oleh pengguna
+                            const blurAmount = blurInput.value;
+
+                            // Jalankan algoritma blur
+                            boxBlur(data, canvas.width, canvas.height, blurAmount);
+
+                            // Pasang data piksel yang telah diubah ke canvas
+                            ctx.putImageData(imageData, 0, 0);
+
+                            // Dapatkan URL gambar yang telah diubah
+                            const modifiedImageURL = canvas.toDataURL();
+
+                            // Tampilkan gambar yang telah diubah
+                            imageDisplay.src = modifiedImageURL;
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                }
+            }
+
+            function boxBlur(data, width, height, blurAmount) {
+                const radius = Math.floor(blurAmount);
+                const diameter = radius * 2;
+
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let red = 0;
+                        let green = 0;
+                        let blue = 0;
+                        let alpha = 0;
+                        let pixelCount = 0;
+
+                        for (let offsetY = -radius; offsetY <= radius; offsetY++) {
+                            for (let offsetX = -radius; offsetX <= radius; offsetX++) {
+                                const currentX = x + offsetX;
+                                const currentY = y + offsetY;
+
+                                if (currentX >= 0 && currentX < width && currentY >= 0 && currentY < height) {
+                                    const index = (currentY * width + currentX) * 4;
+                                    red += data[index];
+                                    green += data[index + 1];
+                                    blue += data[index + 2];
+                                    alpha += data[index + 3];
+                                    pixelCount++;
+                                }
+                            }
+                        }
+
+                        const currentIndex = (y * width + x) * 4;
+                        data[currentIndex] = Math.round(red / pixelCount);
+                        data[currentIndex + 1] = Math.round(green / pixelCount);
+                        data[currentIndex + 2] = Math.round(blue / pixelCount);
+                        data[currentIndex + 3] = Math.round(alpha / pixelCount);
+                    }
+                }
+            }
+
+    </script>
+</body>
+
+</html>

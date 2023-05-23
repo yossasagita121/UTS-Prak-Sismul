@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Contrast</title>
+    <style>
+        .menu {
+            margin-bottom: 20px;
+        }
+    
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .menu li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    
+        .menu li a {
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    
+        .menu li a:hover {
+            background-color: #f0f0f0;
+        }
+        img {
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="menu">
+        <ul>
+            <li><a href="kecerahan.html">Ubah Kecerahan Gambar</a></li>
+            <li><a href="blur.html">Ubah Blur Gambar</a></li>
+            <li><a href="size.html">Ubah Ukuran Gambar</a></li>
+            <li><a href="compress.html">Ubah Kualitas Gambar</a></li>
+            <li><a href="audio.html">Audio Processing</a></li>
+        </ul>
+    </div>
+    <h1>Kecerahan Gambar</h1>
+    <form>
+        <label for="image">Pilih gambar:</label>
+        <input type="file" id="image" accept="image/*">
+        <br><br>
+        <label for="contrast">Kecerahan (-100 to 100):</label>
+        <input type="range" id="contrast" min="-100" max="100" value="0">
+        <br><br>
+        <input type="button" value="Proses" onclick="applyContrast()">
+    </form>
+    <br>
+    <img id="imageDisplay" src="" alt="Image">
+    <script>
+        function applyContrast() {
+                const imageInput = document.getElementById('image');
+                const contrastInput = document.getElementById('contrast');
+                const imageDisplay = document.getElementById('imageDisplay');
+
+                // Cek apakah file gambar telah dipilih
+                if (imageInput.files && imageInput.files[0]) {
+                    const reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        const img = new Image();
+                        img.onload = function () {
+                            // Buat elemen canvas
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+
+                            // Gambar gambar asli ke canvas
+                            ctx.drawImage(img, 0, 0);
+
+                            // Dapatkan data piksel gambar
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            // Ubah kontras gambar
+                            const contrastValue = contrastInput.value / 100;
+                            for (let i = 0; i < data.length; i += 4) {
+                                data[i] = (data[i] - 128) * contrastValue + 128;
+                                data[i + 1] = (data[i + 1] - 128) * contrastValue + 128;
+                                data[i + 2] = (data[i + 2] - 128) * contrastValue + 128;
+                            }
+
+                            // Pasang data piksel yang telah diubah ke canvas
+                            ctx.putImageData(imageData, 0, 0);
+
+                            // Dapatkan URL gambar yang telah diubah
+                            const modifiedImageURL = canvas.toDataURL();
+
+                            // Tampilkan gambar yang telah diubah
+                            imageDisplay.src = modifiedImageURL;
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                }
+            }
+
+    </script>
+</body>
+
+</html>

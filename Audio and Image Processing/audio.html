@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Text To Speech</title>
+    <style>
+      .menu {
+            margin-bottom: 20px;
+        }
+    
+        .menu ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .menu li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+    
+        .menu li a {
+            text-decoration: none;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    
+        .menu li a:hover {
+            background-color: #f0f0f0;
+        }
+    #demoC, #demoC * { padding: 10px; }
+    #demoC {
+      max-width: 400px;
+      background: #f2f2f2;
+    }
+    #demoC * {
+      font-family: arial, sans-serif;
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+    }
+    </style>
+
+  </head>
+  <body>
+    <div class="menu">
+      <ul>
+        <li><a href="kecerahan.html">Ubah Kecerahan Gambar</a></li>
+        <li><a href="blur.html">Ubah Blur Gambar</a></li>
+        <li><a href="size.html">Ubah Ukuran Gambar</a></li>
+        <li><a href="compress.html">Ubah Kualitas Gambar</a></li>
+        <li><a href="audio.html">Audio Processing</a></li>
+      </ul>
+    </div>
+    <form id="demoC">
+
+      <label>Volume</label>
+      <input type="range" id="demoC-vol" min="0" max="1" step="0.1" value="1">
+      <label>Pitch</label>
+      <input type="range" id="demoC-pitch" min="0" max="2" step="0.1" value="1">
+      <label>Kecepatan</label>
+      <input type="range" id="demoC-rate" min="0.1" max="10" step="0.1" value="1">
+
+
+      <label>Tulis Ucapan</label>
+      <input type="text" id="demoC-msg" disabled required>
+      <label>Proses</label>
+      <input type="submit" id="demoC-go" disabled value="Speak">
+    </form>
+    <script>
+      if ("speechSynthesis" in window) {
+
+          let demo = document.getElementById("demoC"),
+            vvol = document.getElementById("demoC-vol"),
+            vpitch = document.getElementById("demoC-pitch"),
+            vrate = document.getElementById("demoC-rate"),
+            vmsg = document.getElementById("demoC-msg"),
+            vgo = document.getElementById("demoC-go");
+
+          var speak = () => {
+            let msg = new SpeechSynthesisUtterance();
+            msg.voice = speechSynthesis.getVoices()[0];
+            msg.text = vmsg.value;
+            msg.volume = +vvol.value;
+            msg.pitch = +vpitch.value;
+            msg.rate = +vrate.value;
+            speechSynthesis.speak(msg);
+            return false;
+          };
+
+          demo.onsubmit = speak;
+          vmsg.disabled = false;
+          vgo.disabled = false;
+        }
+    </script>
+  </body>
+</html>
